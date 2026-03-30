@@ -7,14 +7,14 @@
 
 namespace libnet {
 
-class IPv4Subnet {
+class IPv4Net {
 private:
     uint32_t _base_addr; // Начальный адрес (Например: 10.0.0.0)
     uint32_t _mask;      // Маска (Например 24)
     uint32_t _current;   // Смещение для следующего адреса
 
 public:
-    IPv4Subnet(uint32_t base, uint32_t mask_bits)
+    IPv4Net(uint32_t base, uint32_t mask_bits)
         : _base_addr(base), _mask(mask_bits), _current(1) {}; // Начинаем с .1
     
 

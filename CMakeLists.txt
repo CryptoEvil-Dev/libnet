@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-project(libnet LANGUAGES CXX)
+project(net LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 1. Собираем библиотеку
 file(GLOB_RECURSE SOURCES "models/impl/*.cpp" "tun/impl/*.cpp" "types/impl/*.cpp")
-add_library(libnet STATIC ${SOURCES})
+add_library(net STATIC ${SOURCES})
 
-target_include_directories(libnet PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # 2. Загружаем GoogleTest
 if(POLICY CMP0135)
@@ -29,11 +29,11 @@ enable_testing()
 
 # Тест IPv4
 add_executable(unit_test tests/test_ipv4.cpp)
-target_link_libraries(unit_test PRIVATE libnet gtest_main)
+target_link_libraries(unit_test PRIVATE net gtest_main)
 
 # Тест uint128_t
 add_executable(uint128t_test tests/test_uint128.cpp)
-target_link_libraries(uint128t_test PRIVATE libnet gtest_main)
+target_link_libraries(uint128t_test PRIVATE net gtest_main)
 
 
 # Переносим бинарник в build/tests
