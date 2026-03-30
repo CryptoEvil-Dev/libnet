@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cassert>
 #include <sys/socket.h>
 #include <unistd.h>
 
