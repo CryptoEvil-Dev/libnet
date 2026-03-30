@@ -26,11 +26,18 @@ FetchContent_MakeAvailable(googletest)
 # 3. Настройка тестов
 enable_testing()
 
+
+# Тест IPv4
 add_executable(unit_test tests/test_ipv4.cpp)
 target_link_libraries(unit_test PRIVATE libnet gtest_main)
 
+# Тест uint128_t
+add_executable(uint128t_test tests/test_uint128.cpp)
+target_link_libraries(uint128t_test PRIVATE libnet gtest_main)
+
+
 # Переносим бинарник в build/tests
-set_target_properties(unit_test PROPERTIES 
+set_target_properties(unit_test uint128t_test PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
 )
 
@@ -41,3 +48,4 @@ target_include_directories(unit_test PRIVATE
 )
 
 add_test(NAME MyIPv4Test COMMAND unit_test)
+add_test(NAME UInt128Test COMMAND test_uint128)
