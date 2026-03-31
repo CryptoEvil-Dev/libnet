@@ -3,7 +3,7 @@
 #pragma once
 
 #include <cstdint>
-#include "types/include/ipv4.hpp"
+#include <libnet/network/ipv4.hpp>
 
 namespace libnet {
 

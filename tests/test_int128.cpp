@@ -1,6 +1,6 @@
 #include <iostream>
 #include <gtest/gtest.h>
-#include <types/include/int128.hpp>
+#include <libnet/core/int128.hpp>
 
 // 1. Тест конструкторов и базового вывода
 TEST(UInt128Test, ConstructionAndString) {

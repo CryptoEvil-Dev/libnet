@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #include <gtest/gtest.h>
-#include <types/include/ipv4.hpp>
+#include <libnet/network/ipv4.hpp>
 
 TEST(IPv4Test, DefaultConstructor) {
     libnet::IPv4 addr;

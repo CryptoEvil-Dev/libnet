@@ -1,16 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
-project(net LANGUAGES CXX)
+project(libnet LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. Собираем библиотеку
-file(GLOB_RECURSE SOURCES "models/impl/*.cpp" "tun/impl/*.cpp" "types/impl/*.cpp")
-add_library(net STATIC ${SOURCES})
+# 1. Сборка библиотеки
+# Используем явное перечисление или GLOB по новой структуре src/
+file(GLOB_RECURSE LIB_SOURCES 
+    "src/core/*.cpp" 
+    "src/network/*.cpp" 
+    "src/dev/*.cpp"
+)
 
-target_include_directories(net PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(net STATIC ${LIB_SOURCES})
 
-# 2. Загружаем GoogleTest
+# Важно: указываем путь к include так, чтобы внутри файлов 
+# можно было писать #include <libnet/core/uint128.hpp>
+target_include_directories(net PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+# 2. Установка (Инсталляция)
+install(TARGETS net DESTINATION lib)
+install(DIRECTORY "include/libnet" DESTINATION include)
+
+# 3. Тесты (GoogleTest)
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
@@ -23,33 +38,21 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# 3. Настройка тестов
 enable_testing()
 
+# Функция для быстрого добавления тестов
+function(add_libnet_test name source)
+    add_executable(${name} ${source})
+    target_link_libraries(${name} PRIVATE net gtest_main)
+    set_target_properties(${name} PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
+    )
+endfunction()
 
-# Тест IPv4
-add_executable(unit_test tests/test_ipv4.cpp)
-target_link_libraries(unit_test PRIVATE net gtest_main)
+add_libnet_test(test_ipv4 tests/test_ipv4.cpp)
+add_libnet_test(test_uint128 tests/test_uint128.cpp)
+add_libnet_test(test_int128 tests/test_int128.cpp)
 
-# Тест uint128_t
-add_executable(uint128t_test tests/test_uint128.cpp)
-target_link_libraries(uint128t_test PRIVATE net gtest_main)
-
-# Тест int128_t
-add_executable(int128t_test tests/test_int128.cpp)
-target_link_libraries(int128t_test PRIVATE net gtest_main)
-
-
-# Переносим бинарник в build/tests
-set_target_properties(unit_test uint128t_test int128t_test PROPERTIES 
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
-)
-
-# Помогаем VS Code найти заголовки gtest
-target_include_directories(unit_test PRIVATE 
-    ${googletest_SOURCE_DIR}/googletest/include 
-    ${googletest_SOURCE_DIR}/googlemock/include
-)
-
-add_test(NAME MyIPv4Test COMMAND unit_test)
+add_test(NAME IPv4Test COMMAND test_ipv4)
 add_test(NAME UInt128Test COMMAND test_uint128)
+add_test(NAME Int128Test COMMAND test_int128)
