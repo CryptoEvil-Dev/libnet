@@ -1,4 +1,4 @@
-#include "types/include/ipv6.hpp"
+#include <libnet/network/ipv6.hpp>
 
 libnet::IPv6::IPv6(const char* address) {
     int double_colon_idx = -1;

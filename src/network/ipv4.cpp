@@ -1,4 +1,4 @@
-#include "types/include/ipv4.hpp"
+#include <libnet/network/ipv4.hpp>
 
 libnet::IPv4::IPv4(const char* address) {
     _addr = 0;
