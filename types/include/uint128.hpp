@@ -5,19 +5,15 @@
 #include <algorithm>
 #include <cstdint>
 
-
-
 namespace libnet {
 
 class uint128_t {
 private:
     __uint128_t value;
 
-    uint128_t(__uint128_t v) noexcept : value(v) {}
-
 public:
     uint128_t() noexcept : value(0) {};
-
+    uint128_t(__uint128_t v) noexcept : value(v) {}
 
     // Шаблонный конструктор для ЛЮБЫХ целых чисел (кроме __uint128_t)
     template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
@@ -33,6 +29,15 @@ public:
     // --- Арифметика ---
     uint128_t operator+(const uint128_t& other) const noexcept { return {value + other.value}; }
     uint128_t operator-(const uint128_t& other) const noexcept { return {value - other.value}; }
+    uint128_t operator*(const uint128_t& other) const noexcept { return value * other.value; }
+    uint128_t operator/(const uint128_t& other) const noexcept { return value / other.value; }
+    uint128_t operator%(const uint128_t& other) const noexcept { return value % other.value; }
+
+    uint128_t& operator+=(const uint128_t& other) noexcept { value += other.value; return *this; }
+    uint128_t& operator-=(const uint128_t& other) noexcept { value -= other.value; return *this; }
+    uint128_t& operator*=(const uint128_t& other) noexcept { value *= other.value; return *this; }
+    uint128_t& operator/=(const uint128_t& other) noexcept { value /= other.value; return *this; }
+
 
     // --- Сравнения ---
     bool operator==(const uint128_t& other) const noexcept { return value == other.value; }
@@ -53,6 +58,13 @@ public:
 
     uint128_t operator<<(int shift) const noexcept { return {value << shift}; }
     uint128_t operator>>(int shift) const noexcept { return {value >> shift}; }
+
+    // Битовые присваивания
+    uint128_t& operator&=(const uint128_t& other) noexcept { value &= other.value; return *this; }
+    uint128_t& operator|=(const uint128_t& other) noexcept { value |= other.value; return *this; }
+    uint128_t& operator^=(const uint128_t& other) noexcept { value ^= other.value; return *this; }
+    uint128_t& operator<<=(int shift) noexcept { value <<= shift; return *this; }
+    uint128_t& operator>>=(int shift) noexcept { value >>= shift; return *this; }
 
     // --- Вспомогательные функции ---
     std::string to_string() const noexcept;

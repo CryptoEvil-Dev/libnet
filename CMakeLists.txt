@@ -35,9 +35,13 @@ target_link_libraries(unit_test PRIVATE net gtest_main)
 add_executable(uint128t_test tests/test_uint128.cpp)
 target_link_libraries(uint128t_test PRIVATE net gtest_main)
 
+# Тест int128_t
+add_executable(int128t_test tests/test_int128.cpp)
+target_link_libraries(int128t_test PRIVATE net gtest_main)
+
 
 # Переносим бинарник в build/tests
-set_target_properties(unit_test uint128t_test PROPERTIES 
+set_target_properties(unit_test uint128t_test int128t_test PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests"
 )
 
