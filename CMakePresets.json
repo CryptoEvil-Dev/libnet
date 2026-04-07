@@ -1,0 +1,42 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "base-config",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "CMAKE_CXX_STANDARD": "20" }
+    },
+    { "name": "build_all", "inherits": "base-config", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
+    { "name": "build_tests", "inherits": "base-config", "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" } },
+    { "name": "build_release", "inherits": "base-config", "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" } }
+  ],
+  "buildPresets": [
+    { "name": "build_all", "configurePreset": "build_all" },
+    { "name": "build_tests", "configurePreset": "build_tests", "targets": [ "test_ipv4", "test_uint128", "test_int128" ] },
+    { "name": "build_release", "configurePreset": "build_release", "targets": [ "net" ] }
+  ],
+  "workflowPresets": [
+    {
+      "name": "build_all",
+      "steps": [
+        { "type": "configure", "name": "build_all" },
+        { "type": "build", "name": "build_all" }
+      ]
+    },
+    {
+      "name": "build_tests",
+      "steps": [
+        { "type": "configure", "name": "build_tests" },
+        { "type": "build", "name": "build_tests" }
+      ]
+    },
+    {
+      "name": "build_release",
+      "steps": [
+        { "type": "configure", "name": "build_release" },
+        { "type": "build", "name": "build_release" }
+      ]
+    }
+  ]
+}
