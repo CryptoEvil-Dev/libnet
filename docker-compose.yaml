@@ -1,0 +1,13 @@
+services:
+  builder:
+    build: 
+      context: .
+      # Добавляем DNS для этапа сборки образа
+      network: host 
+    image: libnet-builder
+    volumes:
+      - .:/app
+    # Использование сети хоста поможет пробросить настройки DNS
+    network_mode: "host"
+    # Если нужно, можно поменять команду ниже (Например tail -f /dev/null и контейнер вечный)
+    command: cmake --workflow --preset build_all
