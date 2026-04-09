@@ -14,6 +14,13 @@ file(GLOB_RECURSE LIB_SOURCES
 
 add_library(net STATIC ${LIB_SOURCES})
 
+add_custom_command(TARGET net POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/libnet"
+    "${CMAKE_BINARY_DIR}/include/libnet"
+    COMMENT "Copying headers to build directory..."
+)
+
 # Важно: указываем путь к include так, чтобы внутри файлов 
 # можно было писать #include <libnet/core/uint128.hpp>
 target_include_directories(net PUBLIC 
