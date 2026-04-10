@@ -1,43 +1,35 @@
-// Простой набросок! Переписать и дополнить в будущем!
-// ВОЗМОЖНО ОПАСНЫЙ КОД!
 #pragma once
-
-#include <cstdint>
 #include <libnet/network/ipv4.hpp>
+#include <libnet/core/bitset.hpp>
+#include <memory>
+#include <string_view>
+#include <mutex>
 
 namespace libnet {
 
 class IPv4Net {
 private:
-    uint32_t _base_addr; // Начальный адрес (Например: 10.0.0.0)
-    uint32_t _mask;      // Маска (Например 24)
-    uint32_t _current;   // Смещение для следующего адреса
+    libnet::IPv4 _base;
+    uint8_t _prefix;
+    std::unique_ptr<libnet::bitset> _pool;
+    mutable std::mutex _mutex;
 
 public:
-    IPv4Net(uint32_t base, uint32_t mask_bits)
-        : _base_addr(base), _mask(mask_bits), _current(1) {}; // Начинаем с .1
+    IPv4Net(std::string_view cidr);
+
+    // Проверка вхождения в сеть (без учета занятости)
+    bool Contains(const libnet::IPv4& ip) const noexcept;
     
+    // Проверка: свободен ли адрес для выделения
+    bool IsFree(const libnet::IPv4& ip) const noexcept;
 
-    // Сколько всего хостов доступно в этой маске
-    size_t capacity() const {
-        return 1ULL << (32 - _mask);
-    }
+    // Выделение и освобождение
+    libnet::IPv4 Allocate();
+    void Release(const IPv4& ip) noexcept;
+    void Reserve(const libnet::IPv4& ip);
 
-    // Проверка: Входит ли IP в эту подсеть
-    // bool contains(libnet::IPv4 addr) const {
-        
-    // }
-
-    libnet::IPv4 next() {
-        // Простая проверка: Не вышли ли мы за пределы маски (например, /24 это 254 адреса)
-        uint32_t max_hosts = (1 << (32 - _mask)) - 2;
-        if(_current > max_hosts) {
-            throw std::runtime_error("Subnet is full");
-        }
-
-        // Собираем IP: база + смещение
-        return libnet::IPv4(_base_addr | _current++, 0);
-    }
+    uint8_t GetPrefix() const noexcept { return _prefix; }
+    libnet::IPv4 GetBaseAddress() const noexcept { return _base; }
 };
 
 }

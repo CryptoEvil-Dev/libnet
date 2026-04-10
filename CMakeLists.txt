@@ -58,8 +58,10 @@ endfunction()
 
 add_libnet_test(test_ipv4 tests/test_ipv4.cpp)
 add_libnet_test(test_ipv6 tests/test_ipv6.cpp)
+add_libnet_test(test_ipv4net tests/test_ipv4net.cpp)
 add_libnet_test(test_uint128 tests/test_uint128.cpp)
 add_libnet_test(test_int128 tests/test_int128.cpp)
+add_libnet_test(test_bitset tests/test_bitset.cpp)
 
 add_test(NAME IPv4Test COMMAND test_ipv4)
 add_test(NAME UInt128Test COMMAND test_uint128)
