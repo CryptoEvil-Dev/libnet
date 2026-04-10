@@ -57,6 +57,7 @@ function(add_libnet_test name source)
 endfunction()
 
 add_libnet_test(test_ipv4 tests/test_ipv4.cpp)
+add_libnet_test(test_ipv6 tests/test_ipv6.cpp)
 add_libnet_test(test_uint128 tests/test_uint128.cpp)
 add_libnet_test(test_int128 tests/test_int128.cpp)
 

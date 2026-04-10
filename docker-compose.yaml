@@ -1,9 +1,9 @@
 services:
   builder:
-    build: 
+    build:
       context: .
       # Добавляем DNS для этапа сборки образа
-      network: host 
+      network: host
     image: libnet-builder
     volumes:
       - .:/app
