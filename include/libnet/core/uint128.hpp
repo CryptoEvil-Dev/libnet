@@ -41,8 +41,15 @@ public:
 
     // --- Сравнения ---
     bool operator==(const uint128_t& other) const noexcept { return value == other.value; }
-    bool operator==(uint64_t other) const noexcept { return value == other; }
-    friend bool operator==(uint64_t lhs, const uint128_t& rhs) noexcept { return lhs == rhs.value; }
+    bool operator==(const __uint128_t& other) const noexcept { return value == other; }
+    friend bool operator==(const __uint128_t& lhs, const uint128_t& rhs) noexcept { return lhs == rhs.value; }
+    
+    bool operator>=(const uint128_t& other) const noexcept { return value >= other.value; }
+    bool operator<=(const uint128_t& other) const noexcept { return value <= other.value; }
+    // Для сравнения с обычными числами (size_t/uint64_t)
+    bool operator>=(uint64_t other) const noexcept { return value >= other; }
+    bool operator<=(uint64_t other) const noexcept { return value <= other; }
+
 
     bool operator!=(const uint128_t& other) const noexcept { return !(*this == other); }
     bool operator!=(uint64_t other) const noexcept { return !(*this == other); }

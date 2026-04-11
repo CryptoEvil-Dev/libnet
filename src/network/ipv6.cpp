@@ -1,13 +1,14 @@
 #include <libnet/network/ipv6.hpp>
 #include <arpa/inet.h>
+#include <endian.h>
 #include <cstring>
 
 libnet::IPv6::IPv6(const char* address) {
     std::string addr_str(address);
     std::string ip_part = addr_str;
     
-    // Проверка на наличие порта [addr]:port
-    if (addr_str.front() == '[') {
+    // Парсинг порта [addr]:port
+    if (!addr_str.empty() && addr_str.front() == '[') {
         size_t bracket_end = addr_str.find(']');
         if (bracket_end != std::string::npos) {
             ip_part = addr_str.substr(1, bracket_end - 1);
@@ -20,13 +21,18 @@ libnet::IPv6::IPv6(const char* address) {
 
     in6_addr tmp_addr;
     if (inet_pton(AF_INET6, ip_part.c_str(), &tmp_addr) == 1) {
-        // Копируем 16 байт в наш uint128_t (учитываем big-endian сети)
-        uint64_t high, low;
-        std::memcpy(&high, &tmp_addr.s6_addr[0], 8);
-        std::memcpy(&low, &tmp_addr.s6_addr[8], 8);
+        // Собираем uint128_t из байт вручную (Big Endian в Host Order)
+        uint64_t high = 0;
+        uint64_t low = 0;
         
-        // Преобразуем из сетевого порядка байт в хостовый
-        _addr = uint128_t(be64toh(high), be64toh(low));
+        for (int i = 0; i < 8; ++i) {
+            high = (high << 8) | tmp_addr.s6_addr[i];
+            low = (low << 8) | tmp_addr.s6_addr[i + 8];
+        }
+        
+        _addr = uint128_t(high, low);
+    } else {
+        _addr = uint128_t(0);
     }
 }
 
@@ -45,17 +51,22 @@ std::string libnet::IPv6::GetAddress() const noexcept {
     char buf[INET6_ADDRSTRLEN];
     in6_addr tmp_addr;
     
-    uint64_t high = htobe64(_addr.high());
-    uint64_t low = htobe64(_addr.low());
+    uint64_t high = _addr.high();
+    uint64_t low = _addr.low();
     
-    std::memcpy(&tmp_addr.s6_addr[0], &high, 8);
-    std::memcpy(&tmp_addr.s6_addr[8], &low, 8);
+    for (int i = 7; i >= 0; --i) {
+        tmp_addr.s6_addr[i] = high & 0xFF;
+        high >>= 8;
+        tmp_addr.s6_addr[i + 8] = low & 0xFF;
+        low >>= 8;
+    }
     
     if (inet_ntop(AF_INET6, &tmp_addr, buf, sizeof(buf))) {
         return {buf};
     }
     return "::";
 }
+
 
 std::string libnet::IPv6::GetFullAddress() const noexcept {
     if (_port > 0) {

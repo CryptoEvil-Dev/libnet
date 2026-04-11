@@ -29,6 +29,7 @@ public:
     void reset(size_t bit_idx) noexcept;
     bool test(size_t bit_idx) const noexcept;
     std::optional<size_t> FindFirstFree() const;
+    size_t get_bits_count() const noexcept { return _bits_count; }
 
 };
 
