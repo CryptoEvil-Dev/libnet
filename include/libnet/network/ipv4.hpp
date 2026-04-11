@@ -23,6 +23,8 @@ namespace libnet {
         IPv4(IPv4&&) = default;
         ~IPv4() = default;
 
+        IPv4(const sockaddr_in& sa) noexcept;
+
         IPv4& operator = (const char* address) {
             *this = IPv4(address);
             return *this;

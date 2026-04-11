@@ -24,6 +24,11 @@ libnet::IPv4::IPv4(const char* address) {
     _addr |= buffer;
 }
 
+libnet::IPv4::IPv4(const sockaddr_in& sa) noexcept {
+    _addr = ntohl(sa.sin_addr.s_addr);
+    _port = ntohs(sa.sin_port);
+}
+
 std::string libnet::IPv4::GetAddress() const noexcept {
     uint8_t addr[4] = {0};
     addr[0] = (_addr >> 24) & 0xFF;
