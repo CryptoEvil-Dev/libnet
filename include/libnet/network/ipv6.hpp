@@ -22,6 +22,8 @@ namespace libnet {
             return _addr == other._addr && _port == other._port;
         }
 
+        IPv6(const sockaddr_in6& sa) noexcept;
+
         std::string GetFullAddress() const noexcept;
         std::string GetAddress() const noexcept;
         uint16_t GetPort() const noexcept { return _port; }

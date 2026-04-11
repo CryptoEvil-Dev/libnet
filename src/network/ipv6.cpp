@@ -30,6 +30,17 @@ libnet::IPv6::IPv6(const char* address) {
     }
 }
 
+libnet::IPv6::IPv6(const sockaddr_in6& sa) noexcept {
+    _port = ntohs(sa.sin6_port);
+
+    uint64_t high, low;
+    std::memcpy(&high, &sa.sin6_addr.s6_addr[0], 8);
+    std::memcpy(&low, &sa.sin6_addr.s6_addr[8], 8);
+
+    // Переводим из сетевого порядка (Big Endian) в хостовой
+    _addr = uint128_t(be64toh(high), be64toh(low));
+}
+
 std::string libnet::IPv6::GetAddress() const noexcept {
     char buf[INET6_ADDRSTRLEN];
     in6_addr tmp_addr;
