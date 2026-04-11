@@ -3,6 +3,7 @@
 #include <libnet/core/uint128.hpp>
 #include <libnet/core/bitset.hpp>
 #include <libnet/dev/tun.hpp>
+#include <libnet/dev/udpsocket.hpp>
 #include <libnet/network/ipv4.hpp>
 #include <libnet/network/ipv6.hpp>
 #include <libnet/network/ipv4net.hpp>
