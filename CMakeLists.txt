@@ -66,6 +66,7 @@ add_libnet_test(test_bitset tests/test_bitset.cpp)
 
 add_libnet_test(test_udpsocket tests/test_udpsocket.cpp)
 add_libnet_test(test_tun tests/test_tun.cpp)
+add_libnet_test(test_eventloop tests/test_eventloop.cpp)
 
 add_test(NAME IPv4Test COMMAND test_ipv4)
 add_test(NAME UInt128Test COMMAND test_uint128)
