@@ -45,6 +45,36 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+
+
+# 4. Примеры (Examples)
+option(LIBNET_BUILD_EXAMPLES "Build library examples" ON)
+
+if(LIBNET_BUILD_EXAMPLES)
+    # Ищем все .cpp файлы в папке examples
+    file(GLOB EXAMPLE_SOURCES "examples/*.cpp")
+
+    foreach(source_file ${EXAMPLE_SOURCES})
+        # Получаем имя файла без расширения (например, "udp_echo")
+        get_filename_component(example_name ${source_file} NAME_WE)
+        
+        # Создаем исполняемый файл
+        add_executable(${example_name} ${source_file})
+        
+        # Линкуем с нашей библиотекой
+        target_link_libraries(${example_name} PRIVATE net)
+        
+        # Кладём скомпилированные примеры в отдельную папку в build
+        set_target_properties(${example_name} PROPERTIES 
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/examples"
+        )
+        
+        message(STATUS "Example added: ${example_name}")
+    endforeach()
+endif()
+
+
+
 enable_testing()
 
 # Функция для быстрого добавления тестов
