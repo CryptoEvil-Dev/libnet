@@ -2,63 +2,55 @@
 #include <libnet/dev/udpsocket.hpp>
 #include <libnet/network/ipv4.hpp>
 #include <libnet/network/ipv6.hpp>
+#include <libnet/network/packet.hpp> // Добавили для IPPacket
 #include <thread>
 #include <chrono>
 
 TEST(UDPSocketTest, SendAndReceiveIPv4) {
-    // 1. Создаем два сокета на loopback-интерфейсе
-    // Порт 0 позволяет ОС самой выбрать свободный порт
     libnet::UDPSocket server(libnet::IPv4("127.0.0.1:0"));
     libnet::UDPSocket client(libnet::IPv4("127.0.0.1:0"));
 
-    // Выясняем, какой порт выделила ОС для сервера
     sockaddr_in sin;
     socklen_t len = sizeof(sin);
     getsockname(server.get_fd(), (struct sockaddr *)&sin, &len);
     libnet::IPv4 server_addr(ntohl(sin.sin_addr.s_addr), ntohs(sin.sin_port));
 
     std::string message = "Hello, Libnet!";
-    
-    // 2. Отправляем данные от клиента серверу
     client.sendto(server_addr, message.c_str(), message.size());
 
-    // 3. Получаем данные на сервере
+    // Теперь это std::pair<std::variant<IPv4, IPv6>, std::vector<uint8_t>>
     auto result = server.recv();
 
-    // 4. Проверки
-    EXPECT_EQ(result.data.size(), message.size());
-    std::string received_msg(result.data.begin(), result.data.end());
+    // result.first — адрес, result.second — данные
+    EXPECT_EQ(result.second.size(), message.size());
+    std::string received_msg(result.second.begin(), result.second.end());
     EXPECT_EQ(received_msg, message);
 
-    // Проверяем, что адрес отправителя (клиента) определился корректно
-    EXPECT_TRUE(std::holds_alternative<libnet::IPv4>(result.addr));
+    EXPECT_EQ(result.first.GetAddress(), "127.0.0.1");
 }
 
-TEST(UDPSocketTest, VariantDataInterface) {
+TEST(UDPSocketTest, IPPacketInterface) {
     libnet::UDPSocket server(libnet::IPv4("127.0.0.1:0"));
     libnet::UDPSocket client(libnet::IPv4("127.0.0.1:0"));
 
-    // Узнаем адрес сервера
     sockaddr_in sin;
     socklen_t len = sizeof(sin);
     getsockname(server.get_fd(), (struct sockaddr *)&sin, &len);
     libnet::IPv4 server_addr(ntohl(sin.sin_addr.s_addr), ntohs(sin.sin_port));
 
-    // Готовим UDPdata
-    libnet::UDPdata packet;
-    packet.addr = server_addr;
-    packet.data = { 'P', 'I', 'N', 'G' };
+    // Вместо VariantDataInterface тестируем отправку нашего нового IPPacket
+    libnet::IPv4 src("10.0.0.1:0");
+    libnet::IPPacket packet(libnet::UDP, src, server_addr, "PING");
 
-    // Отправляем через variant-интерфейс
-    client.sendto(packet);
+    client.sendto(server_addr, packet);
 
     auto result = server.recv();
-    EXPECT_EQ(result.data[0], 'P');
+    // Проверяем, что первый байт полезной нагрузки — 'E' (0x45 в IPv4 заголовке)
+    // Так как сокет получил сырой IPPacket целиком
+    EXPECT_EQ(result.second[0], 0x45); 
 }
 
 TEST(UDPSocketTest, IPv6SimpleInit) {
-    // Просто проверяем, что IPv6 сокет создается и биндится без ошибок
-    // (на некоторых системах IPv6 может быть отключен в loopback, поэтому оборачиваем в try)
     try {
         libnet::UDPSocket sock_v6(libnet::IPv6("[::1]:0"));
         EXPECT_GT(sock_v6.get_fd(), 0);

@@ -8,3 +8,5 @@
 #include <libnet/network/ipv6.hpp>
 #include <libnet/network/ipv4net.hpp>
 #include <libnet/network/ipv6net.hpp>
+#include <libnet/core/eloop.hpp>
+#include <libnet/network/packet.hpp>

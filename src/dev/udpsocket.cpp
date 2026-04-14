@@ -50,26 +50,24 @@ ssize_t libnet::UDPSocket::sendto(const libnet::IPv6& dest, const void* data, si
     return ::sendto(_fd, data, len, 0, (struct sockaddr*)&sa, sizeof(sa));
 };
 
-ssize_t libnet::UDPSocket::sendto(const libnet::UDPdata& packet) {
-    return std::visit([&](auto&& addr) {
-        return this->sendto(addr, packet.data.data(), packet.data.size());
-    }, packet.addr);
-};
-
-libnet::UDPdata libnet::UDPSocket::recv(size_t max_len) {
+std::pair<libnet::IPv4, std::vector<uint8_t>> libnet::UDPSocket::recv(size_t max_len) {
     std::vector<uint8_t> buffer(max_len);
-
-    sockaddr_storage src_addr{};
+    sockaddr_in src_addr{};
     socklen_t addr_len = sizeof(src_addr);
 
-    ssize_t n = recvfrom(_fd, buffer.data(), max_len, 0, (struct sockaddr*)&src_addr, &addr_len);
-    if(n < 0) throw std::runtime_error("recvfrom failed");
+    size_t n = ::recvfrom(_fd, buffer.data(), max_len, 0, (struct sockaddr*)&src_addr, &addr_len);
+    if(n < 0) throw std::runtime_error("UDP recv failed");
 
     buffer.resize(n);
+    return { libnet::IPv4(src_addr), std::move(buffer) };
+}
 
-    if(src_addr.ss_family == AF_INET) {
-        return { libnet::IPv4(*reinterpret_cast<sockaddr_in*>(&src_addr)), std::move(buffer) };
-    } else {
-        return { libnet::IPv6(*reinterpret_cast<sockaddr_in6*>(&src_addr)), std::move(buffer) };
-    }
+std::pair<libnet::IPv4, libnet::IPPacket> libnet::UDPSocket::recv_packet(size_t max_len) {
+    auto [from, data] = recv(max_len);
+    return {from, libnet::IPPacket(std::move(data))};
+}
+
+ssize_t libnet::UDPSocket::sendto(const libnet::IPv4& dest, const libnet::IPPacket& pkt) {
+    auto sa = dest.GetSockAddr();
+    return ::sendto(_fd, pkt.ToVector().data(), pkt.Size(), 0, (struct sockaddr*)&sa, sizeof(sa));
 }
