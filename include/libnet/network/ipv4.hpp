@@ -16,6 +16,7 @@ namespace libnet {
         IPv4() = default;
         IPv4(const char* address);
         IPv4(const std::string_view addr) : IPv4(std::string(addr).c_str()) {};
+        IPv4(const std::string_view addr, int port) noexcept;
         IPv4(const uint32_t address, const uint16_t port) noexcept
             : _addr(address), _port(port) {}
 

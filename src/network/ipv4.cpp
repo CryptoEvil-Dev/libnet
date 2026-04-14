@@ -24,6 +24,25 @@ libnet::IPv4::IPv4(const char* address) {
     _addr |= buffer;
 }
 
+libnet::IPv4::IPv4(const std::string_view addr, int port) noexcept {
+    _addr = 0;
+    _port = static_cast<uint16_t>(port);
+    uint8_t buffer = 0;
+    uint8_t shift = 24;
+    
+    for (size_t i = 0; i < addr.length(); ++i) {
+        if (addr[i] == '.') {
+            _addr |= (static_cast<uint32_t>(buffer) << shift);
+            buffer = 0;
+            shift -= 8;
+        } else if (addr[i] >= '0' && addr[i] <= '9') {
+            buffer = buffer * 10 + (addr[i] - '0');
+        }
+    }
+    // Добавляем последний октет
+    _addr |= buffer;
+}
+
 libnet::IPv4::IPv4(const sockaddr_in& sa) noexcept {
     _addr = ntohl(sa.sin_addr.s_addr);
     _port = ntohs(sa.sin_port);
