@@ -22,13 +22,13 @@ TEST(EventLoopTest, UDPBridge) {
     // 1. Когда данные приходят на первый сокет — пересылаем их второму
     loop.Add(sock1.get_fd(), [&](int fd) {
         auto msg = sock1.recv();
-        sock1.sendto(addr2, msg.data.data(), msg.data.size());
+        sock1.sendto(addr2, msg.second.data(), msg.second.size());
     });
 
     // 2. Когда данные приходят на второй сокет — проверяем и стопаем цикл
     loop.Add(sock2.get_fd(), [&](int fd) {
         auto msg = sock2.recv();
-        std::string s(msg.data.begin(), msg.data.end());
+        std::string s(msg.second.begin(), msg.second.end());
         if (s == payload) {
             received = true;
             loop.Stop();
