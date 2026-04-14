@@ -65,6 +65,7 @@ add_libnet_test(test_int128 tests/test_int128.cpp)
 add_libnet_test(test_bitset tests/test_bitset.cpp)
 
 add_libnet_test(test_udpsocket tests/test_udpsocket.cpp)
+add_libnet_test(test_tcp tests/test_tcp.cpp)
 add_libnet_test(test_tun tests/test_tun.cpp)
 add_libnet_test(test_packet tests/test_packet.cpp)
 add_libnet_test(test_eventloop tests/test_eventloop.cpp)

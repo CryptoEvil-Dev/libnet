@@ -10,3 +10,5 @@
 #include <libnet/network/ipv6net.hpp>
 #include <libnet/core/eloop.hpp>
 #include <libnet/network/packet.hpp>
+#include <libnet/dev/tcp_connection.hpp>
+#include <libnet/dev/tcp_server.hpp>
